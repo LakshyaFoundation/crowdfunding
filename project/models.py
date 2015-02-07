@@ -1,8 +1,13 @@
+
+from datetime import date
+from math import floor
+
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.aggregates import Sum
+
 from project.utils import IntegerRangeField
 from project.constants import PROJECT_STATUS, UNAPPROVED
-from math import floor
 # Create your models here.
 
 
@@ -34,6 +39,37 @@ class Project(models.Model):
 	            self.ordering = 1
 	    super(Project, self).save(**kwargs)
 
+    def get_days_remaining(self):
+        remaining = self.period - (date.today() - self.start_date).days
+        return remaining if remaining > 0 else 0
+    days_remaining = property(get_days_remaining)
+
+    def get_total_pledged_amount(self):
+        pledge_amounts = self.pledges.all().values_list('amount', flat=True)
+        total = 0
+        for amount in pledge_amounts:
+            total += amount
+        return total
+    pledged_amount = property(get_total_pledged_amount)
+
+    def get_percentage_pledged(self):
+        ratio = float(self.get_total_pledged_amount()) / self.goal
+        return ratio * 100
+    percentage_pledged = property(get_percentage_pledged)
+
+    def get_total_backers(self):
+        return self.pledges.count()
+    total_backers = property(get_total_backers)
+
+    def get_image_urls(self):
+        images = self.project_image.all().order_by('ordering')
+        return [i.image.url for i in images]
+
+    def get_primary_picture_url(self):
+        images = self.project_image.all().order_by('ordering')
+        return images[0].image.url if images else ''
+    primary_picture_url = property(get_primary_picture_url)
+
 
 
 class ProjectImage(models.Model):
@@ -62,7 +98,7 @@ class Pledge(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return self.project + ' - ' + self.user
+        return self.project.title + ' - ' + self.user.get_full_name()
 
 
 class Message(models.Model):
