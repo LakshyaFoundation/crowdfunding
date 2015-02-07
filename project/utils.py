@@ -2,7 +2,7 @@ from django.db import models
 #custom models here
 
 from south.modelsinspector import add_introspection_rules
-add_introspection_rules([], ["^main\.models\.IntegerRangeField"])
+add_introspection_rules([], ["^project\.utils\.IntegerRangeField"])
 
 class IntegerRangeField(models.IntegerField):
     def __init__(self, verbose_name=None, name=None, min_value=None, max_value=None, **kwargs):

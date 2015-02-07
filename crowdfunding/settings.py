@@ -157,7 +157,7 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(os.path.dirname(__file__),'static'),
     #'/opt/lakshya/Shakespeer/crowdfunding/static',
-    os.path.join(BASE_DIR, 'crowdfunding/static')
+    os.path.join(BASE_DIR, 'static')
 )
 
 LOGGING = {
