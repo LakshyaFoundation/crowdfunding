@@ -63,7 +63,7 @@ class ProjectListAPIView(View):
             response = {'success': 'true', 'projects': data}
         except ValueError:
             response = {'success': 'false', 'projects': []}
-        return HttpResponse(json.dumps(response))
+        return HttpResponse(json.dumps(response), content_type="application/json")
 
     def get_project_json_data(self, p, request):
         image_urls = ['http://' + request.get_host() + url for url in p.get_image_urls()]
@@ -104,7 +104,7 @@ class PledgeCreateAPIView(View):
 		else:
 			Pledge.objects.create(user=user, amount=amount, project=project)
 			response = {'success': 'true'}
-		return HttpResponse(json.dumps(response))
+		return HttpResponse(json.dumps(response), content_type="application/json")
 
 	def get_params(self, request):
 		errors = []
