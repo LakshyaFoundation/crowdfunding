@@ -60,7 +60,7 @@ class ProjectListAPIView(View):
             for p in projects:
                 data.append(self.get_project_json_data(p, request))
 
-            response = {'success': 'true', 'projects': data}
+            response = {'success': 'true', 'projects': data, 'total_projects': Project.objects.count()}
         except ValueError:
             response = {'success': 'false', 'projects': []}
         return HttpResponse(json.dumps(response), content_type="application/json")
