@@ -4,7 +4,6 @@ from math import floor
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.aggregates import Sum
 
 from project.utils import IntegerRangeField
 from project.constants import PROJECT_STATUS, UNAPPROVED
@@ -53,8 +52,10 @@ class Project(models.Model):
     pledged_amount = property(get_total_pledged_amount)
 
     def get_percentage_pledged(self):
+        if not self.goal:
+            return 0
         ratio = float(self.get_total_pledged_amount()) / self.goal
-        return ratio * 100
+        return int(ratio * 100)
     percentage_pledged = property(get_percentage_pledged)
 
     def get_total_backers(self):
@@ -98,7 +99,7 @@ class Pledge(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return self.project.title + ' - ' + self.user.get_full_name()
+        return self.project.title + ' - ' + (self.user.get_full_name() or self.user.username)
 
 
 class Message(models.Model):

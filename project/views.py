@@ -44,7 +44,7 @@ class ProjectCreateView(TemplateView):
         else:
             response = {'success': 'false'}
         return HttpResponse(json.dumps(response))
-    
+
 
 class ProjectView(TemplateView):
     template_name = 'project/view.html'
@@ -94,3 +94,43 @@ class ProjectListView(TemplateView):
         # project = Project.objects.get(id=kwargs.get('id'))
         context['projects'] = Project.objects.all()
         return context
+
+
+class PledgeCreateAPIView(View):
+	def post(self, request, **kwargs):
+		amount, user, project, errors = self.get_params(request)
+		if errors:
+			response = {'success': 'false', 'errors': errors}
+		else:
+			Pledge.objects.create(user=user, amount=amount, project=project)
+			response = {'success': 'true'}
+		return HttpResponse(json.dumps(response))
+
+	def get_params(self, request):
+		errors = []
+		try:
+			amount = int(request.POST.get('amount', ''))
+			if not amount:
+				errors.append('Amount cannot be zero')
+		except ValueError:
+			errors.append('Amount [' + request.POST.get('amount', '') + '] is not a valid integer')
+
+		user = None
+		try:
+			user_id = int(request.POST.get('user_id', ''))
+			user = User.objects.get(id=user_id)
+		except ValueError:
+			errors.append('User ID [' + request.POST.get('user_id', '') + '] is not a valid integer')
+		except User.DoesNotExist:
+			errors.append('No valid user exists with ID [' + request.POST.get('user_id', '') + ']')
+
+		project = None
+		try:
+			project_id = request.POST.get('project_id', '')
+			project = Project.objects.get(id=project_id)
+		except ValueError:
+			errors.append('Project ID [' + request.POST.get('project_id', '') + '] is not a valid integer')
+		except Project.DoesNotExist:
+			errors.append('No valid project exists with ID [' + request.POST.get('project_id', '') + ']')
+
+		return (amount, user, project, errors)
