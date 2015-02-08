@@ -21,7 +21,7 @@ class Project(models.Model):
     video_url = models.URLField(max_length=1000, blank=True)
     team = models.TextField(max_length=1000)
     risks_and_challenges = models.TextField(max_length=4000, blank=True)
-    ordering = models.DecimalField(default=1, max_digits=4, decimal_places=1, blank=True)
+    ordering = models.DecimalField(max_digits=4, decimal_places=1, blank=True)
     start_date = models.DateField()
     created = models.DateTimeField(auto_now_add=True)
     status = models.SmallIntegerField(
